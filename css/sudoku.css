@@ -2,9 +2,33 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
+    margin: 0;
+    height: 100vh;
 }
 
 #sudoku-board{
     display: grid;
-    
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(9, 1fr);
+    height: 500px;
+    width: 500px;
+    background-color: blue;
+}
+
+.slot{
+    background-color: blanchedalmond;
+    border: 1px solid black;
+}
+
+.thick-top{
+    border-top: 3px;
+}
+.thick-right{
+    border-right: 3px;
+}
+.thick-left{
+    border-left: 3px;
+}
+.thick-bottom{
+    border-bottom: 3px;
 }
