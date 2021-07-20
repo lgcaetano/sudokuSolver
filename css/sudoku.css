@@ -21,6 +21,9 @@ body{
     background-color: blanchedalmond;
     border: 1px solid black;
     font-weight: 900;
+    padding-top: calc(50% - 18px);
+    font-size: 24px;
+    text-align: center;
 }
 
 .thick-top{
