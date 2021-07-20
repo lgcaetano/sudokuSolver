@@ -4,6 +4,7 @@ body{
     align-items: center;
     margin: 0;
     height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 #sudoku-board{
@@ -12,13 +13,14 @@ body{
     grid-template-rows: repeat(9, 1fr);
     height: 500px;
     width: 500px;
-    background-color: blue;
+    background-color: black;
     border: solid 3px black;
 }
 
 .slot{
     background-color: blanchedalmond;
     border: 1px solid black;
+    font-weight: 900;
 }
 
 .thick-top{

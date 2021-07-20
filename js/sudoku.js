@@ -30,8 +30,30 @@ class SudokuGame {
         this.numericalMatrix = this.createSlots(false)
         this.selectedSlot = null;
         this.tag.onclick = () => this.changeSelectedSlot()
+        document.onclick = (e) => this.checkOutsideClick(e)
     }
     
+    checkOutsideClick(e){
+        // const insidePossibilities = document.querySelectorAll('#sudoku-board, #sudoku-board *')
+        // let clickWasOutside = false
+        // console.log(e.target)
+        if(!(this.tag == e.target || this.tag.contains(e.target)))
+            this.unselectSlots()
+            // console.log('HEY')
+    }
+
+    unselectSlots(){
+        this.selectedSlot = null
+        this.tagMatrix.forEach(array => array.forEach(elemento => {
+            if(elemento.isObserved()){
+                elemento.removeHighlightObserved()
+            }
+            if(elemento.isSelected()){
+                elemento.unselect()
+            }
+        }))
+    }
+
     createSlots(tagFlag = true){
         const matrix = []
         for(let i = 0; i < 9; i++){
@@ -46,17 +68,15 @@ class SudokuGame {
         return matrix
     }
 
-    getObservedElements(){
-
-    }
 
 
 
     changeSelectedSlot(){
-        if(this.selectedSlot != null){
+        const originalSelected = this.selectedSlot
+        if(this.selectedSlot){
             this.selectedSlot.unselect()
         }
-        this.selectedSlot = this.findSelected()
+        this.selectedSlot = this.findSelected() || originalSelected
         this.highlightObservedSlots()
         this.selectedSlot.select()
 
