@@ -1,4 +1,22 @@
+function getMatrixColumn(matrix, columnNumber){
+    const arrColuna = []
+    matrix.forEach(array => array.forEach((elemento, index) => {
+        if(index == columnNumber)
+            arrColuna.push(elemento)
+    }))
+    return arrColuna
+}
 
+function getSquare(matrix, slot){
+    const arrSquare = []
+    matrix.forEach(array => array.forEach(elemento => {
+        if(Math.floor(elemento.getX() / 3) == Math.floor(slot.getX() / 3) 
+        && Math.floor(elemento.getY() / 3) == Math.floor(slot.getY() / 3)){
+            arrSquare.push(elemento)
+        }
+    }))
+    return arrSquare
+}
 
 
 
@@ -28,13 +46,41 @@ class SudokuGame {
         return matrix
     }
 
+    getObservedElements(){
+
+    }
+
+
+
     changeSelectedSlot(){
         if(this.selectedSlot != null){
             this.selectedSlot.unselect()
         }
         this.selectedSlot = this.findSelected()
+        this.highlightObservedSlots()
+        this.selectedSlot.select()
+
         // console.log(this.selectedSlot)
     }
+
+    highlightArray(array){
+        array.forEach(elemento => {
+            elemento.hightlightObserved()
+        })
+    }
+
+
+    highlightObservedSlots(){
+        this.tagMatrix.forEach(array => array.forEach(elemento => {
+            if(elemento.isObserved()){
+                elemento.removeHighlightObserved()
+            }
+        }))
+        this.highlightArray(getMatrixColumn(this.tagMatrix, this.selectedSlot.getX()))
+        this.highlightArray(this.tagMatrix[this.selectedSlot.getY()])
+        this.highlightArray(getSquare(this.tagMatrix, this.selectedSlot))
+    }
+
 
     
     findSelected(){
@@ -97,6 +143,7 @@ class SudokuSlot{
 
 
     select(){
+        this.removeHighlightObserved()
         this.tag.classList.add('selected-slot')
     }
 
@@ -106,6 +153,19 @@ class SudokuSlot{
 
     isSelected(){
         return this.tag.classList.contains('selected-slot')
+    }
+
+    hightlightObserved(){
+        if(!this.isObserved())
+            this.tag.classList.add('observed-slot')
+    }
+
+    removeHighlightObserved(){
+        this.tag.classList.remove('observed-slot')
+    }
+
+    isObserved(){
+        return this.tag.classList.contains('observed-slot')
     }
 }
 

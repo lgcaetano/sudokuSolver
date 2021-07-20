@@ -35,5 +35,9 @@ body{
 }
 
 .selected-slot{
-    background-color: lightsteelblue;
+    background-color: rgb(139, 160, 230);
+}
+
+.observed-slot{
+    background-color: rgb(212, 212, 212);
 }
