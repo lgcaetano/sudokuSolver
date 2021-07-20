@@ -13,6 +13,7 @@ body{
     height: 500px;
     width: 500px;
     background-color: blue;
+    border: solid 3px black;
 }
 
 .slot{
@@ -21,14 +22,18 @@ body{
 }
 
 .thick-top{
-    border-top: 3px;
+    border-top: 3px solid black;
 }
 .thick-right{
-    border-right: 3px;
+    border-right: 3px solid black;
 }
 .thick-left{
-    border-left: 3px;
+    border-left: 3px solid black;
 }
 .thick-bottom{
-    border-bottom: 3px;
+    border-bottom: 3px solid black;
+}
+
+.selected-slot{
+    background-color: lightsteelblue;
 }
