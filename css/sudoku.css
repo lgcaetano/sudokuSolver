@@ -7,22 +7,31 @@ body{
     font-family: Arial, Helvetica, sans-serif;
 }
 
+#sudoku-container{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    
+}
+
 #sudoku-board{
     display: grid;
     grid-template-columns: repeat(9, 1fr);
     grid-template-rows: repeat(9, 1fr);
-    height: 500px;
-    width: 500px;
+    height: 400px;
+    width: 400px;
     background-color: black;
     border: solid 3px black;
 }
 
 .slot{
-    background-color: blanchedalmond;
+    background-color: white;
     border: 1px solid black;
     font-weight: 900;
     padding-top: calc(50% - 18px);
-    font-size: 24px;
+    font-size: 150%;
     text-align: center;
 }
 
@@ -45,4 +54,24 @@ body{
 
 .observed-slot{
     background-color: rgb(212, 212, 212);
+}
+
+#buttons{
+    display: flex;
+    width: 400px;
+    justify-content: space-around;
+    /* align-items: center; */
+}
+
+.some-button{
+    border: 2px solid black;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 50px;
+    transition: 2s;
+}
+
+.some-button:hover{
+    background-color: black;
+    color: white;
+    cursor: pointer;
 }

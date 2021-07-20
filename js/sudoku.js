@@ -33,11 +33,20 @@ class SudokuGame {
         this.selectedSlot = null;
         this.tag.onclick = () => this.changeSelectedSlot()
         document.onclick = (e) => this.checkOutsideClick(e)
-        this.printCount = 0
-        this.solveTagMatrix()
+        // this.printCount = 0
+        document.querySelector('#solve').onclick = () => this.solveTagMatrix()
         this.matrixLockedFlag = 0
+        document.onkeypress = (e) => this.checkToFillSlot(e)
+        document.querySelector('#clear').onclick = () => this.clearMatrix()
     }
     
+    clearMatrix(){
+        const allSlots = this.tagMatrix.flat(Infinity)
+        allSlots.forEach(element => element.fillSlot(0))
+    }
+
+
+
     checkOutsideClick(e){
         // const insidePossibilities = document.querySelectorAll('#sudoku-board, #sudoku-board *')
         // let clickWasOutside = false
@@ -130,11 +139,9 @@ class SudokuGame {
                 if(this.tagMatrix[i][j].getValue() == 0){
                     const currentSlot = this.tagMatrix[i][j]
                     
-                    for(let k = 1; k < 10 && !this.matrixLockedFlag; k++){
+                    for(let k = 1; k <= 9 && !this.matrixLockedFlag; k++){
                         
                         if(this.valueIsPossible(currentSlot, k)){
-                            this.printCount += 1
-                            console.log(this.printCount)
                             console.log(k)
                             currentSlot.fillSlot(k)
                             this.solveTagMatrix()
@@ -149,6 +156,37 @@ class SudokuGame {
         }
         this.matrixLockedFlag = 1
         return
+    }
+
+    selectNext(){
+        for(let i = this.selectedSlot.getY(); i < 9; i++){ 
+            let j
+            if(i == this.selectedSlot.getY())
+                j = this.selectedSlot.getX()
+            else 
+                j = 0   
+            for(j; j < 9; j++){
+                if(this.tagMatrix[i][j].getValue() == 0){
+                    this.tagMatrix[i][j].select()
+                    this.changeSelectedSlot()
+                    return
+                }
+            }
+        }
+    }
+
+
+    checkToFillSlot(event){
+        if(this.selectedSlot == null)
+            return
+        let key;
+        key = event.keyCode - 48
+        if(!(key > 0 && key < 10))
+            return
+        if(this.selectedSlot.getValue() == 0 &&  this.valueIsPossible(this.selectedSlot, key)){
+            this.selectedSlot.fillSlot(key)
+            this.selectNext()
+        }
     }
 
 
