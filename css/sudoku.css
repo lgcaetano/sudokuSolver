@@ -5,6 +5,7 @@ body{
     margin: 0;
     height: 100vh;
     font-family: Arial, Helvetica, sans-serif;
+    color: rgb(2, 14, 71);;
 }
 
 #sudoku-container{
@@ -24,15 +25,15 @@ body{
     grid-template-rows: repeat(9, 1fr);
     height: 400px;
     width: 400px;
-    background-color: black;
-    border: solid 3px black;
+    background-color: rgb(2, 14, 71);;
+    border: solid 3px rgb(2, 14, 71);;
 }
 
 .slot{
     box-sizing: content-box;
     position: relative;
     background-color: white;
-    border: 1px solid black;
+    border: 1px solid rgb(2, 14, 71);;
     font-weight: 900;
     /* padding-top: calc(50% - 18px); */
     line-height: 150%;
@@ -64,23 +65,24 @@ body{
 #buttons{
     display: flex;
     flex-direction: column;
-    height: calc(50% - 200px);
+    height: calc(50% - 150px);
     width: 400px;
     justify-content: space-around;
     /* align-items: center; */
 }
 
 .some-button{
-    /* border: 2px solid black; */
+    /* border: 2px solid rgb(2, 14, 71);; */
     border: 0px;
     background-color: inherit;
     font-family: monospace;
     font-size: 30px;
     transition: 1s;
+    color: rgb(2, 14, 71);;
 }
 
 .some-button:hover{
-    background-color: black;
+    background-color: rgb(2, 14, 71);
     color: white;
     cursor: pointer;
 }
@@ -99,3 +101,56 @@ body{
     height: 50%;
     justify-content: space-around;
 }
+
+#radio-container{
+    width: 100%;
+    height: 200px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#radio-container label{
+    position: relative;
+    font-family: monospace;
+    font-size: 20px;
+    left: -20px;
+    color: rgb(2, 14, 71);
+}
+
+label input{
+    position: relative;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.checkmark{
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    height: 10px;
+    width: 10px;
+    background-color: inherit;
+    border: 2px solid rgb(2, 14, 71);
+    border-radius: 50%;
+}
+
+.inner{
+    position: relative;
+    left: 1px;
+    top: 1px;
+    background-color: white;
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    transition: 500ms;
+}
+
+
+
+label input:checked + .checkmark .inner{
+    background-color: rgb(2, 14, 71);
+}
+
+

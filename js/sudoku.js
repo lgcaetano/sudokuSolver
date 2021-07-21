@@ -62,6 +62,11 @@ function randomizeArray(array){
 
 
 
+function removeElementAtIndex(array, index){
+    return array.splice(index, 1)[0]
+}
+
+
 function existsEmptySlot(matrix){
     for(let i = 0; i < 9; i++){
         for(let j = 0; j < 9; j++){
@@ -75,8 +80,8 @@ function existsEmptySlot(matrix){
 
 
 
-function randomRowOrColumn(){
-    return Math.floor(Math.random() * 9)
+function randomNumber(number){
+    return Math.floor(Math.random() * number)
 }
 
 
@@ -134,7 +139,7 @@ class SudokuGame {
         }
     }
 
-    fillSudoku(matrix, settingsObject = { checkNumSolutions: false, numSolutions: 0 }, rand = 0){
+    fillSudoku(matrix, settingsObject = { checkNumSolutions: false, numSolutions: 0, maxSolutions: 1 }, rand = 0){
         
         
         const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -164,7 +169,7 @@ class SudokuGame {
             }
         }
         
-        if(settingsObject.checkNumSolutions == true){
+        if(settingsObject.checkNumSolutions == true && settingsObject.numSolutions < settingsObject.maxSolutions){
             settingsObject.numSolutions++;
             return 0;
         }
@@ -182,32 +187,52 @@ class SudokuGame {
         const attemptsMatrix = this.createSlots(false)
 
         this.fillSudoku(matrix,{ checkNumSolutions: false }, 1)
+
+        const notTriedArray = []
         
-        let randX = randomRowOrColumn()
-        let randY = randomRowOrColumn()
+        for(let i = 0; i < 81; i++){
+            notTriedArray.push(i)
+        }
+        
+        let randIndex = randomNumber(notTriedArray.length)
+        let randSlot = notTriedArray[randIndex]
+        let randX = randSlot % 9
+        let randY = Math.floor(randSlot / 9)
         
         let curValue = 0
         
-        const solutionsObject = { checkNumSolutions: true, numSolutions: 1 }
+        const solutionsObject = { checkNumSolutions: true, numSolutions: 1, maxSolutions: 2 }
 
         
-        while(solutionsObject.numSolutions <= 1){
+        while(notTriedArray.length > 30){
 
             solutionsObject.numSolutions = 0
 
+            console.log(randY, randX, randSlot, notTriedArray.length)
             curValue = matrix[randY][randX]
-            if(attemptsMatrix[randY][randX] == 0)
-                matrix[randY][randX] = 0
+
+            matrix[randY][randX] = 0
+
+            let start = new Date()
 
             this.fillSudoku(matrixCopy(matrix), solutionsObject)
             
+            let end = new Date()
+
+            if(start - end > 500)
+                break
+
             if(solutionsObject.numSolutions > 1){
                 matrix[randY][randX] = curValue
-                attemptsMatrix[randY][randX] = 1
+                // attemptsMatrix[randY][randX] = 1
             }
 
-            randX = randomRowOrColumn()
-            randY = randomRowOrColumn()
+            removeElementAtIndex(notTriedArray, randIndex)
+            
+            randIndex = randomNumber(notTriedArray.length)
+            randSlot = notTriedArray[randIndex]
+            randX = randSlot % 9
+            randY = Math.floor(randSlot / 9)
         }
         return matrix
     }
