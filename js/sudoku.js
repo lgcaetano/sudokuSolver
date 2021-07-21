@@ -7,6 +7,9 @@ function getMatrixColumn(matrix, columnNumber){
     return arrColuna
 }
 
+
+
+
 function getSquare(matrix, slot){
     const arrSquare = []
     matrix.forEach(array => array.forEach(elemento => {
@@ -19,6 +22,8 @@ function getSquare(matrix, slot){
 }
 
 
+
+
 function wait(ms) {
     let start = Date.now(),
     now = start;
@@ -26,6 +31,8 @@ function wait(ms) {
       now = Date.now();
     }
 }
+
+
 
 function getSquareNumerical(matrix, x, y){
     const arrSquare = []
@@ -51,7 +58,6 @@ function randomizeArray(array){
     while(auxArr.length > 0){
         array.push(auxArr.pop())
     }
-    // console.log(array)
 }
 
 
@@ -71,6 +77,18 @@ function existsEmptySlot(matrix){
 
 function randomRowOrColumn(){
     return Math.floor(Math.random() * 9)
+}
+
+
+function matrixCopy(matrix){
+    const returnMatrix = []
+    for(let i = 0; i < matrix.length; i++){
+        returnMatrix.push([])
+        for(let j = 0; j < matrix[0].length; j++){
+            returnMatrix[i].push(matrix[i][j])
+        }
+    }
+    return returnMatrix
 }
 
 
@@ -116,12 +134,13 @@ class SudokuGame {
         }
     }
 
-    fillRandomSudokuMatrix(matrix, settingsObject = { checkNumSolutions: false, numSolutions: 0 }){
+    fillSudoku(matrix, settingsObject = { checkNumSolutions: false, numSolutions: 0 }, rand = 0){
         
         
         const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         
-        randomizeArray(numbers)
+        if(rand)
+            randomizeArray(numbers)
         
         let finishedFlag = 0
         
@@ -134,7 +153,7 @@ class SudokuGame {
                         
                         if(this.numValueIsPossible(matrix, numbers[k - 1], j, i)){
                             matrix[i][j] = numbers[k - 1]
-                            finishedFlag = this.fillRandomSudokuMatrix(matrix, settingsObject)
+                            finishedFlag = this.fillSudoku(matrix, settingsObject)
                             if(!finishedFlag){
                                 matrix[i][j] = 0
                             }
@@ -156,21 +175,23 @@ class SudokuGame {
 
 
     generatePuzzle(){
+
         this.clearMatrix()
+
         const matrix = this.createSlots(false)
         const attemptsMatrix = this.createSlots(false)
 
-        this.fillRandomSudokuMatrix(matrix)
+        this.fillSudoku(matrix,{ checkNumSolutions: false }, 1)
         
         let randX = randomRowOrColumn()
         let randY = randomRowOrColumn()
         
         let curValue = 0
         
-        const solutionsObject = { checkNumSolutions: true, numSolutions: 0 }
+        const solutionsObject = { checkNumSolutions: true, numSolutions: 1 }
 
         
-        while(solutionsObject.numSolutions < 2){
+        while(solutionsObject.numSolutions <= 1){
 
             solutionsObject.numSolutions = 0
 
@@ -178,17 +199,16 @@ class SudokuGame {
             if(attemptsMatrix[randY][randX] == 0)
                 matrix[randY][randX] = 0
 
-            this.fillRandomSudokuMatrix(matrix, solutionsObject)
+            this.fillSudoku(matrixCopy(matrix), solutionsObject)
             
-            if(solutionsObject.numSolutions >= 2){
+            if(solutionsObject.numSolutions > 1){
                 matrix[randY][randX] = curValue
-                matrix[randY][randX] = 1
+                attemptsMatrix[randY][randX] = 1
             }
 
             randX = randomRowOrColumn()
             randY = randomRowOrColumn()
         }
-        console.log(matrix)
         return matrix
     }
 
@@ -207,7 +227,7 @@ class SudokuGame {
             for(let i = 0; i < 9; i++)
                 array[i] = 0
         })
-        this.numericalMatrix.forEach(array => console.log(array))
+
         while(this.animationMovesArray.length > 0){
             this.animationMovesArray.shift()
         }
@@ -221,12 +241,8 @@ class SudokuGame {
     }
 
     checkOutsideClick(e){
-        // const insidePossibilities = document.querySelectorAll('#sudoku-board, #sudoku-board *')
-        // let clickWasOutside = false
-        // console.log(e.target)
         if(!(this.tag == e.target || this.tag.contains(e.target)))
             this.unselectSlots()
-            // console.log('HEY')
     }
 
     unselectSlots(){
@@ -250,11 +266,9 @@ class SudokuGame {
                     matrix[i].push(new SudokuSlot(this.tag, i, j, this.numericalMatrix))
                 else{
                     matrix[i].push(0)
-                    // console.log(matrix) 
                 }
             }
         }
-        // console.log(matrix)
         return matrix
     }
 
@@ -266,8 +280,6 @@ class SudokuGame {
         this.selectedSlot = this.findSelected() || originalSelected
         this.highlightObservedSlots()
         this.selectedSlot.select()
-
-        // console.log(this.selectedSlot)
     }
 
     highlightArray(array){
@@ -320,9 +332,10 @@ class SudokuGame {
         return true
     }
 
-    solveNumMatrix(print = 1){
+    solveNumMatrix(print = 1, rand = 0){
+        
         let result = 0
-
+        
 
         for(let i = 0; i < 9; i++){
             for(let j = 0; j < 9; j++){
@@ -358,7 +371,11 @@ class SudokuGame {
     printOutSolution(){
         this.isAnimating = 1
         let currentAction = this.animationMovesArray.shift()
+        
+        if(currentAction == undefined)
+            return
         const currentSlot = this.tagMatrix[currentAction[0]][currentAction[1]]
+
         let value = parseInt(currentAction[2])
         value > 0 ? currentSlot.greenBorder() : currentSlot.redBorder()
         currentSlot.fillSlot(value)
@@ -396,7 +413,6 @@ class SudokuGame {
         if(key >= 37 && key <= 40)
             this.arrowPressed(key - 37)
 
-        console.log(key, 'hey')
         key = event.keyCode - 48
         
         if(!(key > 0 && key < 10))
@@ -408,7 +424,6 @@ class SudokuGame {
     }
 
     arrowPressed(arrowKey){
-        console.log('hey')
         let coluna 
         let linha
         if(arrowKey == 0){
@@ -525,7 +540,6 @@ class SudokuSlot{
     }
 
     redBorder(){
-        // console.log(this.getValue())
         
         if(this.tag.classList.contains('filled'))
             this.tag.classList.remove('filled')
