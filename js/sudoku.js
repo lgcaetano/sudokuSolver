@@ -54,14 +54,23 @@ class SudokuGame {
         this.tag.onclick = () => this.changeSelectedSlot()
         document.onclick = (e) => this.checkOutsideClick(e)
         // this.printCount = 0
-        document.querySelector('#solve').onclick = () => this.solveNumMatrix()
+        document.querySelector('#solve').onclick = () => this.solve()
         this.matrixLockedFlag = 0
-        document.onkeypress = (e) => this.checkToFillSlot(e)
+        document.onkeydown = (e) => this.checkToFillSlot(e)
         document.querySelector('#clear').onclick = () => this.clearMatrix()
         this.animationMovesArray = []
         this.isAnimating = 0
     }
     
+    solve(){
+        this.solveNumMatrix()
+        if(!this.matrixLockedFlag){
+            alert('UNSOLVABLE SUDOKU!')
+        }
+    }
+
+
+
     clearMatrix(){
         
         if(this.isAnimating)
@@ -78,6 +87,9 @@ class SudokuGame {
                 array[i] = 0
         })
         this.numericalMatrix.forEach(array => console.log(array))
+        while(this.animationMovesArray.length > 0){
+            this.animationMovesArray.shift()
+        }
     }
 
     trySolveMatrix(){
@@ -190,44 +202,19 @@ class SudokuGame {
             for(let j = 0; j < 9; j++){
 
                 if(this.numericalMatrix[i][j] == 0){
-                    // const currentSlot = this.numericalMatrix[i][j]
                     
                     for(let k = 1; k <= 9 && !this.matrixLockedFlag; k++){
                         
                         if(this.numValueIsPossible(k, j, i)){
                             
-                            
-                            
-                            // new Promise((resolve) => {
-                            //     wait(10)
-                            //     resolve()
-                            // })
-                            // .then(() => currentSlot.fillSlot(k))
-                            // .then(() => currentSlot.greenBorder())
-                            // .then(() => this.solveNumMatrix())
-                            // .then(() => {
-                            //     if(!this.matrixLockedFlag){
-                            //         currentSlot.fillSlot(0)
-                            //         currentSlot.redBorder()
-                            //     }
-                            // })
                             this.numericalMatrix[i][j] = k
                             this.animationMovesArray.push(`${i}${j}${k}`)
 
                             this.solveNumMatrix()
                             if(!this.matrixLockedFlag){
-                                // currentSlot.fillSlot(0)
                                 this.numericalMatrix[i][j] = 0
-                                // currentSlot.redBorder()
                                 this.animationMovesArray.push(`${i}${j}0`)
                             }
-                            // currentSlot.fillSlot(k)
-                            // currentSlot.greenBorder()
-                            // this.solveNumMatrix()
-                            // if(!this.matrixLockedFlag){
-                            //     currentSlot.fillSlot(0)
-                            //     currentSlot.redBorder()
-                            // }
                         }
                     
                     }
@@ -278,8 +265,14 @@ class SudokuGame {
     checkToFillSlot(event){
         if(this.selectedSlot == null || this.isAnimating)
             return
-        let key;
+        let key = event.keyCode;
+
+        if(key >= 37 && key <= 40)
+            this.arrowPressed(key - 37)
+
+        console.log(key, 'hey')
         key = event.keyCode - 48
+        
         if(!(key > 0 && key < 10))
             return
         if(this.selectedSlot.getValue() == 0 &&  this.tagValueIsPossible(this.selectedSlot, key)){
@@ -288,6 +281,28 @@ class SudokuGame {
         }
     }
 
+    arrowPressed(arrowKey){
+        console.log('hey')
+        let coluna 
+        let linha
+        if(arrowKey == 0){
+            coluna = this.selectedSlot.getX() > 0 ? this.selectedSlot.getX() - 1 : 8
+            this.tagMatrix[this.selectedSlot.getY()][coluna].select()
+        }
+        if(arrowKey == 1){
+            linha = this.selectedSlot.getY() > 0 ? this.selectedSlot.getY() - 1 : 8
+            this.tagMatrix[linha][this.selectedSlot.getX()].select()
+        }
+        if(arrowKey == 2){
+            coluna = this.selectedSlot.getX() < 8 ? this.selectedSlot.getX() + 1 : 0
+            this.tagMatrix[this.selectedSlot.getY()][coluna].select()
+        }
+        if(arrowKey == 3){
+            linha = this.selectedSlot.getY() < 8 ? this.selectedSlot.getY() + 1 : 0
+            this.tagMatrix[linha][this.selectedSlot.getX()].select()
+        }
+        this.changeSelectedSlot()
+    }
 
 }
 

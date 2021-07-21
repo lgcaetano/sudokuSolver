@@ -80,26 +80,10 @@ body{
     cursor: pointer;
 }
 
-.frame{
-    box-sizing: border-box;
-    border: solid 1px blue;
-    height: calc(100% + 2px);
-    width: calc(100% + 2px);
-    /* width: 100%; */
-
-    /* height: calc((100% - 12px) / 9); */
-    /* width: calc((100% - 12px) / 9); */
-    z-index: 1;
-    /* position: absolute; */
-    background-color: transparent;
-    top: calc(-1*(50% - 18px));
-}
-
-
 .filled{
-    border-color: rgb(0, 255, 0);
+    background-color: rgb(0, 255, 0);
 }
 
 .unfilled{
-    border-color: red;
+    background-color: red;
 }
