@@ -17,6 +17,7 @@ body{
 }
 
 #sudoku-board{
+    position: relative;
     display: grid;
     grid-template-columns: repeat(9, 1fr);
     grid-template-rows: repeat(9, 1fr);
@@ -27,25 +28,28 @@ body{
 }
 
 .slot{
+    box-sizing: content-box;
+    position: relative;
     background-color: white;
     border: 1px solid black;
     font-weight: 900;
-    padding-top: calc(50% - 18px);
+    /* padding-top: calc(50% - 18px); */
+    line-height: 150%;
     font-size: 150%;
     text-align: center;
 }
 
 .thick-top{
-    border-top: 3px solid black;
+    margin-top: 3px;
 }
 .thick-right{
-    border-right: 3px solid black;
+    margin-right: 3px;
 }
 .thick-left{
-    border-left: 3px solid black;
+    margin-left: 3px;
 }
 .thick-bottom{
-    border-bottom: 3px solid black;
+    margin-bottom: 3px;
 }
 
 .selected-slot{
@@ -65,13 +69,37 @@ body{
 
 .some-button{
     border: 2px solid black;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: monospace;
     font-size: 50px;
-    transition: 2s;
+    transition: 1s;
 }
 
 .some-button:hover{
     background-color: black;
     color: white;
     cursor: pointer;
+}
+
+.frame{
+    box-sizing: border-box;
+    border: solid 1px blue;
+    height: calc(100% + 2px);
+    width: calc(100% + 2px);
+    /* width: 100%; */
+
+    /* height: calc((100% - 12px) / 9); */
+    /* width: calc((100% - 12px) / 9); */
+    z-index: 1;
+    /* position: absolute; */
+    background-color: transparent;
+    top: calc(-1*(50% - 18px));
+}
+
+
+.filled{
+    border-color: rgb(0, 255, 0);
+}
+
+.unfilled{
+    border-color: red;
 }
