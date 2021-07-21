@@ -41,6 +41,38 @@ function getSquareNumerical(matrix, x, y){
 
 
 
+function randomizeArray(array){
+    const auxArr = []
+    let size = array.length
+    while(size > 0){
+        auxArr.push(array.splice(Math.random() * size, 1)[0])
+        size--
+    }
+    while(auxArr.length > 0){
+        array.push(auxArr.pop())
+    }
+    // console.log(array)
+}
+
+
+
+function existsEmptySlot(matrix){
+    for(let i = 0; i < 9; i++){
+        for(let j = 0; j < 9; j++){
+            if(matrix[i][j] == 0)
+                return 1
+        }
+    }
+    return 0
+}
+
+
+
+
+function randomRowOrColumn(){
+    return Math.floor(Math.random() * 9)
+}
+
 
 
 class SudokuGame {
@@ -60,6 +92,12 @@ class SudokuGame {
         document.querySelector('#clear').onclick = () => this.clearMatrix()
         this.animationMovesArray = []
         this.isAnimating = 0
+        
+        // this.checkMatrix = this.createSlots(false)
+
+        // randomizeArray([1,2,3,4,5,6,7,8,9])
+        
+        document.querySelector('#generate').onclick = () => this.fillBoard(this.generatePuzzle())
     }
     
     solve(){
@@ -69,7 +107,90 @@ class SudokuGame {
         }
     }
 
+    fillBoard(matrix){
+        // thimatrix
+        for(let i = 0; i < 9; i++){
+            for(let j = 0; j < 9; j++){
+                this.tagMatrix[i][j].fillSlot(matrix[i][j])
+            }
+        }
+    }
 
+    fillRandomSudokuMatrix(matrix, settingsObject = { checkNumSolutions: false, numSolutions: 0 }){
+        
+        
+        const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        
+        randomizeArray(numbers)
+        
+        let finishedFlag = 0
+        
+        for(let i = 0; i < 9; i++){
+            for(let j = 0; j < 9; j++){
+                        
+                if(matrix[i][j] == 0){
+                    
+                    for(let k = 1; k <= 9 && !finishedFlag; k++){
+                        
+                        if(this.numValueIsPossible(matrix, numbers[k - 1], j, i)){
+                            matrix[i][j] = numbers[k - 1]
+                            finishedFlag = this.fillRandomSudokuMatrix(matrix, settingsObject)
+                            if(!finishedFlag){
+                                matrix[i][j] = 0
+                            }
+                        }
+                    }
+                    return finishedFlag
+                }
+            }
+        }
+        
+        if(settingsObject.checkNumSolutions == true){
+            settingsObject.numSolutions++;
+            return 0;
+        }
+        return 1
+    }
+
+
+
+
+    generatePuzzle(){
+        this.clearMatrix()
+        const matrix = this.createSlots(false)
+        const attemptsMatrix = this.createSlots(false)
+
+        this.fillRandomSudokuMatrix(matrix)
+        
+        let randX = randomRowOrColumn()
+        let randY = randomRowOrColumn()
+        
+        let curValue = 0
+        
+        const solutionsObject = { checkNumSolutions: true, numSolutions: 0 }
+
+        
+        while(solutionsObject.numSolutions < 2){
+
+            solutionsObject.numSolutions = 0
+
+            curValue = matrix[randY][randX]
+            if(attemptsMatrix[randY][randX] == 0)
+                matrix[randY][randX] = 0
+
+            this.fillRandomSudokuMatrix(matrix, solutionsObject)
+            
+            if(solutionsObject.numSolutions >= 2){
+                matrix[randY][randX] = curValue
+                matrix[randY][randX] = 1
+            }
+
+            randX = randomRowOrColumn()
+            randY = randomRowOrColumn()
+        }
+        console.log(matrix)
+        return matrix
+    }
 
     clearMatrix(){
         
@@ -127,10 +248,13 @@ class SudokuGame {
             for(let j = 0; j < 9; j++){
                 if(tagFlag)
                     matrix[i].push(new SudokuSlot(this.tag, i, j, this.numericalMatrix))
-                else
+                else{
                     matrix[i].push(0)
+                    // console.log(matrix) 
+                }
             }
         }
+        // console.log(matrix)
         return matrix
     }
 
@@ -172,9 +296,8 @@ class SudokuGame {
         return selectedSlot
     }
 
-    numValueIsPossible(value, x, y){
-        const allObserved = [getMatrixColumn(this.numericalMatrix, x), this.numericalMatrix[y],
-                            getSquareNumerical(this.numericalMatrix, x, y)].flat(Infinity)
+    numValueIsPossible(matrix, value, x, y){
+        const allObserved = [getMatrixColumn(matrix, x), matrix[y], getSquareNumerical(matrix, x, y)].flat(Infinity)
          
          for(let i = 0; i < allObserved.length; i++){
             if(allObserved[i] == value)
@@ -198,6 +321,9 @@ class SudokuGame {
     }
 
     solveNumMatrix(print = 1){
+        let result = 0
+
+
         for(let i = 0; i < 9; i++){
             for(let j = 0; j < 9; j++){
 
@@ -205,12 +331,12 @@ class SudokuGame {
                     
                     for(let k = 1; k <= 9 && !this.matrixLockedFlag; k++){
                         
-                        if(this.numValueIsPossible(k, j, i)){
+                        if(this.numValueIsPossible(this.numericalMatrix, k, j, i)){
                             
                             this.numericalMatrix[i][j] = k
                             this.animationMovesArray.push(`${i}${j}${k}`)
 
-                            this.solveNumMatrix()
+                            result = this.solveNumMatrix()
                             if(!this.matrixLockedFlag){
                                 this.numericalMatrix[i][j] = 0
                                 this.animationMovesArray.push(`${i}${j}0`)
@@ -218,7 +344,7 @@ class SudokuGame {
                         }
                     
                     }
-                    return 
+                    return result
                 }
             }
         }
@@ -226,7 +352,7 @@ class SudokuGame {
         if(print)
             this.printOutSolution()
         this.matrixLockedFlag = 1
-        return 
+        return 1
     }
 
     printOutSolution(){
@@ -237,7 +363,7 @@ class SudokuGame {
         value > 0 ? currentSlot.greenBorder() : currentSlot.redBorder()
         currentSlot.fillSlot(value)
         if(this.animationMovesArray.length > 0){
-            setTimeout(() => this.printOutSolution(), 10)
+            setTimeout(() => this.printOutSolution(), 0)
         } else{
             this.isAnimating = 0
         }
