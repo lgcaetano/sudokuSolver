@@ -111,16 +111,13 @@ class SudokuGame {
         // this.printCount = 0
         document.querySelector('#solve').onclick = () => this.solve()
         this.matrixLockedFlag = 0
-        document.onkeydown = (e) => this.checkToFillSlot(e)
+        document.onkeydown = (e) => this.checkTowriteInSlot(e)
         document.querySelector('#clear').onclick = () => this.clearMatrix()
         this.animationMovesArray = []
         this.isAnimating = 0
-        
-        // this.checkMatrix = this.createSlots(false)
-
-        // randomizeArray([1,2,3,4,5,6,7,8,9])
-        
         document.querySelector('#generate').onclick = () => this.fillBoard(this.generatePuzzle())
+        // this.animationActivated = false
+        // document.querySelector('#animation-radio').onclick = (e) => this.animationActivated = e.target.checked
     }
     
     solve(){
@@ -131,10 +128,9 @@ class SudokuGame {
     }
 
     fillBoard(matrix){
-        // thimatrix
         for(let i = 0; i < 9; i++){
             for(let j = 0; j < 9; j++){
-                this.tagMatrix[i][j].fillSlot(matrix[i][j])
+                this.tagMatrix[i][j].writeInSlot(matrix[i][j], true)
             }
         }
     }
@@ -208,7 +204,6 @@ class SudokuGame {
 
             solutionsObject.numSolutions = 0
 
-            console.log(randY, randX, randSlot, notTriedArray.length)
             curValue = matrix[randY][randX]
 
             matrix[randY][randX] = 0
@@ -244,10 +239,12 @@ class SudokuGame {
 
         this.matrixLockedFlag = 0
         const allSlots = this.tagMatrix.flat(Infinity)
+
         allSlots.forEach(element => {
-            element.fillSlot(0)
+            element.writeInSlot(0)
             element.clearSlot()
         })
+
         this.numericalMatrix.forEach(array => {
             for(let i = 0; i < 9; i++)
                 array[i] = 0
@@ -394,21 +391,39 @@ class SudokuGame {
     }
 
     printOutSolution(){
-        this.isAnimating = 1
+        
+        let animationActivated = document.querySelector('#animation-radio').checked
+        
+        if(!animationActivated){
+            this.justShowSolution()
+            return
+        }
+
         let currentAction = this.animationMovesArray.shift()
         
+        
+        this.isAnimating = 1
+
         if(currentAction == undefined)
             return
+
         const currentSlot = this.tagMatrix[currentAction[0]][currentAction[1]]
 
         let value = parseInt(currentAction[2])
         value > 0 ? currentSlot.greenBorder() : currentSlot.redBorder()
-        currentSlot.fillSlot(value)
+        currentSlot.writeInSlot(value)
         if(this.animationMovesArray.length > 0){
             setTimeout(() => this.printOutSolution(), 0)
         } else{
             this.isAnimating = 0
         }
+    }
+
+
+    justShowSolution(){
+        this.tagMatrix.forEach(array => array.forEach(elemento => {
+            elemento.updateValue(true)
+        }))
     }
 
 
@@ -430,9 +445,14 @@ class SudokuGame {
     }
 
 
-    checkToFillSlot(event){
+    checkTowriteInSlot(event){
+
         if(this.selectedSlot == null || this.isAnimating)
             return
+
+        let writingMode = document.querySelector('#writing').checked
+
+
         let key = event.keyCode;
 
         if(key >= 37 && key <= 40)
@@ -443,7 +463,7 @@ class SudokuGame {
         if(!(key > 0 && key < 10))
             return
         if(this.selectedSlot.getValue() == 0 &&  this.tagValueIsPossible(this.selectedSlot, key)){
-            this.selectedSlot.fillSlot(key)
+            this.selectedSlot.writeInSlot(key, writingMode)
             this.selectNext()
         }
     }
@@ -506,17 +526,20 @@ class SudokuSlot{
         }
     }
 
-    fillSlot(newValue){
+    writeInSlot(newValue, clear = false, pencilActivated = false){
         if(newValue == 0){
             this.tag.innerHTML = ''
             this.value = 0
             this.valuesMatrix[this.getY()][this.getX()] = 0
+            // this.clearSlot()
         }
         else{
             this.tag.innerHTML = `${newValue}`
             this.value = newValue
             this.valuesMatrix[this.getY()][this.getX()] = newValue
         }
+        if(clear)
+            this.clearSlot()
     }
 
     getX(){
@@ -574,6 +597,17 @@ class SudokuSlot{
     clearSlot(){
         this.tag.classList.remove('filled')
         this.tag.classList.remove('unfilled')
+    }
+
+    updateValue(solution = false){
+
+        if(this.getValue() == this.valuesMatrix[this.getY()][this.getX()])
+            return
+
+        this.writeInSlot(this.valuesMatrix[this.getY()][this.getX()])
+
+        if(solution)
+            this.greenBorder()
     }
 }
 

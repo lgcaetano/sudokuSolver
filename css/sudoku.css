@@ -127,6 +127,7 @@ label input{
 
 .checkmark{
     position: absolute;
+    z-index: 0;
     left: 5px;
     top: 5px;
     height: 10px;
@@ -149,8 +150,12 @@ label input{
 
 
 
-label input:checked + .checkmark .inner{
+label input:checked+.checkmark .inner{
     background-color: rgb(2, 14, 71);
 }
+/* 
+label input:not(:checked) + .checkmark #animation-radio{
+    background-color: white;
+} */
 
 
