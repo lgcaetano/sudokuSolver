@@ -39,9 +39,14 @@ body{
     line-height: 200%;
     font-size: 150%;
     text-align: center;
-    /* display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr); */
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-template-rows: repeat(1, 1fr);
+}
+
+.slot-grid-mode{
+    grid-template-columns: repeat(3, 13.146px);
+    grid-template-rows: repeat(3, 13.146px);
 }
 
 .thick-top{
@@ -153,15 +158,31 @@ label input{
 
 
 
-label input:checked+.checkmark .inner{
+label input[checked] + .checkmark .inner{
     background-color: rgb(2, 14, 71);
 }
 
 .pencil-slot{
-    color: lightslategray;
-    font-size: 5px;
+    /* height: calc(100%/3);
+    width: calc(100%/3); */
+    color: grey;
+    font-size: 10px;
     text-align: center;
+    line-height: 15px;
+    /* position: absolute; */
     /* line-height: 3px; */
+}
+
+#errors{
+    text-align: center;
+    width: 100%;
+    font-size: 30px;
+    opacity: 0;
+    transition: 1s;
+}
+
+#errors.displayed{
+    opacity: 100;
 }
 
 

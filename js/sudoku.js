@@ -115,13 +115,19 @@ class SudokuGame {
         document.querySelector('#clear').onclick = () => this.clearMatrix()
         this.animationMovesArray = []
         this.isAnimating = 0
-        document.querySelector('#generate').onclick = () => this.fillBoard(this.generatePuzzle())
+        this.playingFlag = 0
+        document.querySelector('#generate').onclick = () => this.play()
+        this.solutionMatrix = this.createSlots(false)
+        this.errorsTag = document.querySelector('#errors')
+        this.numErrors = 0
+        // document.querySelector('#generate').onclick = () => this.fillBoard(this.generatePuzzle())
         // this.animationActivated = false
         // document.querySelector('#animation-radio').onclick = (e) => this.animationActivated = e.target.checked
     }
     
     solve(){
         this.solveNumMatrix()
+        this.playingFlag = 0
         if(!this.matrixLockedFlag){
             this.printOutSolution()
             // alert('UNSOLVABLE SUDOKU!')
@@ -131,7 +137,8 @@ class SudokuGame {
     fillBoard(matrix){
         for(let i = 0; i < 9; i++){
             for(let j = 0; j < 9; j++){
-                this.tagMatrix[i][j].writeInSlot(matrix[i][j], true)
+                // console.log(this.tagMatrix)
+                this.tagMatrix[i][j].writeInSlot(matrix[i][j])
             }
         }
     }
@@ -173,16 +180,32 @@ class SudokuGame {
         return 1
     }
 
+    play(){
+        this.playingFlag = 1
+        this.fillBoard(this.generatePuzzle(this.solutionMatrix))
+        // this.fillBoard(this.generatePuzzle())   
+        this.numErrors = 0
+        this.errorsTag.classList.add('displayed')
+        this.errorsTag.innerHTML = 'Errors = 0/3'
+    }
 
 
-
-    generatePuzzle(){
+    generatePuzzle(solutionMatrix = undefined){
 
         this.clearMatrix()
 
         const matrix = this.createSlots(false)
 
         this.fillSudoku(matrix,{ checkNumSolutions: false }, 1)
+
+        if(solutionMatrix){
+            for(let i = 0; i < 9; i++){
+                for(let j = 0; j < 9; j++){
+                    solutionMatrix[i][j] = matrix[i][j]
+                }
+            }
+        }
+
 
         const notTriedArray = []
         
@@ -234,6 +257,8 @@ class SudokuGame {
 
     clearMatrix(){
         
+        this.errorsTag.classList.remove('displayed')
+
         if(this.isAnimating)
             return
 
@@ -343,6 +368,15 @@ class SudokuGame {
 
 
     tagValueIsPossible(slot, value){
+
+        if(this.playingFlag){
+            if(value == this.solutionMatrix[slot.getY()][slot.getX()])
+                return true
+            else
+                return false
+        }
+
+
         const allObserved = [getMatrixColumn(this.tagMatrix, slot.getX()),
                             this.tagMatrix[slot.getY()],
                             getSquare(this.tagMatrix, slot)].flat(Infinity)
@@ -354,7 +388,7 @@ class SudokuGame {
         return true
     }
 
-    solveNumMatrix(print = 1, rand = 0){
+    solveNumMatrix(print = 1){
         
         let result = 0
         
@@ -451,10 +485,17 @@ class SudokuGame {
         if(this.selectedSlot == null || this.isAnimating)
             return
 
-        let writingMode = document.querySelector('#writing').checked
+        let pencil = document.querySelector('#writing')
 
+        let pencilMode = pencil.checked
 
         let key = event.keyCode;
+
+        console.log(key)
+
+        if(key == 81){
+            pencil.toggleAttribute('checked')
+        }
 
         if(key >= 37 && key <= 40)
             this.arrowPressed(key - 37)
@@ -463,10 +504,38 @@ class SudokuGame {
         
         if(!(key > 0 && key < 10))
             return
-        if(this.selectedSlot.getValue() == 0 &&  this.tagValueIsPossible(this.selectedSlot, key)){
-            this.selectedSlot.writeInSlot(key, writingMode)
-            this.selectNext()
+        
+        if(pencilMode){
+            this.selectedSlot.writeInSlot(key, pencilMode)
+            return
         }
+
+
+
+        if(this.selectedSlot.getValue() == 0){
+            if(this.tagValueIsPossible(this.selectedSlot, key)){
+                this.selectedSlot.writeInSlot(key)
+                this.selectNext()
+            } else if(this.playingFlag){
+                console.log(this.solutionMatrix)
+                this.wrongValue()
+            }
+        }
+    }
+
+    wrongValue(){
+        this.numErrors++
+        if(this.numErrors > 3){
+            this.gameOver()
+            this.numErrors = 0
+            return
+        }
+        document.querySelector('#errors').innerHTML = `Errors: ${this.numErrors}/3`
+    }
+
+    gameOver(){
+        document.querySelector('#errors').innerHTML = `YOU LOST!`
+        this.solve()
     }
 
     arrowPressed(arrowKey){
@@ -507,12 +576,18 @@ class SudokuSlot{
         this.value = 0
         this.putBorders()
         this.tag.onclick = () => this.select()
+        this.pencilGrid = []
+        this.pencilGridEmptyFlag = 1
         // this.intializePencilGrid()
     }
 
     intializePencilGrid(){
-        this.pencilGrid = []
+
+        this.pencilGridEmptyFlag = 0
+        
         let pencilSlot
+        this.tag.classList.add('slot-grid-mode')
+
         for(let i = 0; i < 9; i++){
             pencilSlot = document.createElement('div')
             pencilSlot.classList.add('pencil-slot')
@@ -521,7 +596,16 @@ class SudokuSlot{
         }
     }
 
+    removePencilGrid(){
+        this.pencilGrid.forEach(elemento => {
+            this.tag.removeChild(elemento)
+        })
+        this.tag.classList.remove('slot-grid-mode')
+        
+        this.pencilGrid = []
 
+        this.pencilGridEmptyFlag = 1
+    }
 
     putBorders(){
         if(this.x % 3 == 0){
@@ -539,17 +623,27 @@ class SudokuSlot{
     }
 
     writeInSlot(newValue, pencilActivated = false){
-        if(newValue == 0){
-            this.tag.innerHTML = ''
-            this.value = 0
-            this.valuesMatrix[this.getY()][this.getX()] = 0
-            // this.clearSlot()
+        if(!pencilActivated){
+            this.removePencilGrid()
+            if(newValue == 0){
+                this.tag.innerHTML = ''
+                this.value = 0
+                this.valuesMatrix[this.getY()][this.getX()] = 0
+                // this.clearSlot()
+            }
+            else{
+                this.tag.innerHTML = `${newValue}`
+                this.value = newValue
+                this.valuesMatrix[this.getY()][this.getX()] = newValue
+            }
+        } else {
+            if(this.pencilGridEmptyFlag){
+                this.intializePencilGrid()
+                this.tag.classList.add('slot-grid-mode')
+            }
+            this.pencilGrid[newValue - 1].innerHTML = newValue
         }
-        else{
-            this.tag.innerHTML = `${newValue}`
-            this.value = newValue
-            this.valuesMatrix[this.getY()][this.getX()] = newValue
-        }
+        
     }
 
     getX(){
