@@ -412,6 +412,7 @@ class SudokuGame {
         let value = parseInt(currentAction[2])
         value > 0 ? currentSlot.greenBorder() : currentSlot.redBorder()
         currentSlot.writeInSlot(value)
+
         if(this.animationMovesArray.length > 0){
             setTimeout(() => this.printOutSolution(), 0)
         } else{
@@ -501,15 +502,26 @@ class SudokuSlot{
         this.tag = document.createElement('div')
         this.tag.classList.add('slot')
         this.boardTag.appendChild(this.tag)
-        // this.frameTag = document.createElement('div')
-        // this.frameTag.classList.add('frame')
-        // this.tag.appendChild(this.frameTag)
         this.x = xPosition
         this.y = yPosition
         this.value = 0
         this.putBorders()
         this.tag.onclick = () => this.select()
+        // this.intializePencilGrid()
     }
+
+    intializePencilGrid(){
+        this.pencilGrid = []
+        let pencilSlot
+        for(let i = 0; i < 9; i++){
+            pencilSlot = document.createElement('div')
+            pencilSlot.classList.add('pencil-slot')
+            this.tag.appendChild(pencilSlot)
+            this.pencilGrid.push(pencilSlot)
+        }
+    }
+
+
 
     putBorders(){
         if(this.x % 3 == 0){
@@ -526,7 +538,7 @@ class SudokuSlot{
         }
     }
 
-    writeInSlot(newValue, clear = false, pencilActivated = false){
+    writeInSlot(newValue, pencilActivated = false){
         if(newValue == 0){
             this.tag.innerHTML = ''
             this.value = 0
@@ -538,8 +550,6 @@ class SudokuSlot{
             this.value = newValue
             this.valuesMatrix[this.getY()][this.getX()] = newValue
         }
-        if(clear)
-            this.clearSlot()
     }
 
     getX(){
