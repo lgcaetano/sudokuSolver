@@ -494,7 +494,7 @@ class SudokuGame {
         console.log(key)
 
         if(key == 81){
-            pencil.toggleAttribute('checked')
+            pencil.checked = pencil.checked ? false : true
         }
 
         if(key >= 37 && key <= 40)

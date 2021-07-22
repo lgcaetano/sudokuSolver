@@ -158,7 +158,7 @@ label input{
 
 
 
-label input[checked] + .checkmark .inner{
+label input:checked + .checkmark .inner{
     background-color: rgb(2, 14, 71);
 }
 
