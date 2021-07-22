@@ -123,7 +123,8 @@ class SudokuGame {
     solve(){
         this.solveNumMatrix()
         if(!this.matrixLockedFlag){
-            alert('UNSOLVABLE SUDOKU!')
+            this.printOutSolution()
+            // alert('UNSOLVABLE SUDOKU!')
         }
     }
 
@@ -180,7 +181,6 @@ class SudokuGame {
         this.clearMatrix()
 
         const matrix = this.createSlots(false)
-        const attemptsMatrix = this.createSlots(false)
 
         this.fillSudoku(matrix,{ checkNumSolutions: false }, 1)
 
