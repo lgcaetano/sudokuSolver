@@ -185,4 +185,44 @@ label input:checked + .checkmark .inner{
     opacity: 100;
 }
 
+.panel{
+    position: relative;
+    height: 100%;
+    flex-grow: 1;
+    max-width: calc(50% - 200px);
+}
 
+#info-button{
+    position: relative;
+    left: 20px;
+    top: 20px;
+    height: 65px;
+    width: 65px;
+    font-weight: 900;
+    font-size: 50px;
+    border: 3px solid rgb(2, 14, 71);
+    border-radius: 50%;
+    text-align: center;
+    cursor: pointer;
+    transition: 1s;
+}
+
+#info-button.clicked-info-button{
+    background-color: rgb(2, 14, 71);
+    color: white;
+}
+
+#info-button.clicked-info-button + #info{
+    opacity: 100;
+}
+
+#info{
+    top: 10%;
+    position: relative;
+    width: 75%;
+    left: 12.5%;
+    margin-right: 0px;
+    font-size: 15px;
+    opacity: 0;
+    transition: 2s;
+}

@@ -8,12 +8,24 @@
     <title>Document</title>
 </head>
 <body>
+    <div class="panel">
+        <div id="info-button">i</div>
+        <div id="info">
+            Click on a slot to select it and press the number you think should go on that box <br><br>
+            Press <b>'Q'</b> on your keyboard to toggle pencil writing <br><br>
+            If you click <b>PLAY!</b>, you'll enter playing mode and a random solvable puzzle will be displayed on the board <br><br>
+            In playing mode you can type in the wrong answer 3 times before you lose, which will trigger the algorithm to solve the puzzle<br><br>
+            You can also use this page as just a Sudoku solver, to do that, make sure the board is clear, fill it with the puzzle you desire to solve, and click <b>Solve</b> <br><br>
+            <b>Clear</b> will clear the board and allow you to fill it with whatever you want <br><br>
+
+        </div>
+    </div>
     <div id="sudoku-container">
         <div id="errors">Errors: 0/3</div>
         <div id="sudoku-board"></div>
         <div id="buttons">
             <div id="radio-container">
-                
+
                 <label for="writing mode">
                     <input type="checkbox" name="writing mode" id="writing">
                     <div class="checkmark">
@@ -22,8 +34,8 @@
                     Pencil
                 </label>
                 
-                <label for="writing mode">
-                    <input type="checkbox" name="writing mode" id="animation-radio">
+                <label for="animation mode">
+                    <input type="checkbox" name="animation mode" id="animation-radio" checked>
                     <div class="checkmark">
                         <div class="inner"></div>
                     </div>
@@ -37,6 +49,7 @@
             </div>
         </div>
     </div>
+    <div class="panel"></div>
     <script src="js/sudoku.js"></script>
 </body>
 </html>

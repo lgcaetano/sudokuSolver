@@ -220,10 +220,11 @@ class SudokuGame {
         
         let curValue = 0
         
-        const solutionsObject = { checkNumSolutions: true, numSolutions: 1, maxSolutions: 2 }
+        const solutionsObject = { checkNumSolutions: true, numSolutions: 0, maxSolutions: 2 }
 
+        let difficultyThreshold = 20
         
-        while(notTriedArray.length > 30){
+        while(notTriedArray.length > difficultyThreshold){
 
             solutionsObject.numSolutions = 0
 
@@ -715,5 +716,8 @@ class SudokuSlot{
     }
 }
 
+
+const infoButton = document.querySelector('#info-button') 
+infoButton.onclick = () => infoButton.classList.toggle('clicked-info-button')
 
 const game = new SudokuGame()
