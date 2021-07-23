@@ -109,29 +109,73 @@ class SudokuGame {
         this.tag.onclick = () => this.changeSelectedSlot()
         document.onclick = (e) => this.checkOutsideClick(e)
         // this.printCount = 0
-        document.querySelector('#solve').onclick = () => this.solve()
+        document.querySelector('#solve').onclick = () => this.sendMessageToSolve()
         this.matrixLockedFlag = 0
         document.onkeydown = (e) => this.checkTowriteInSlot(e)
         document.querySelector('#clear').onclick = () => this.clearMatrix()
         this.animationMovesArray = []
         this.isAnimating = 0
         this.playingFlag = 0
-        document.querySelector('#generate').onclick = () => this.play()
+        document.querySelector('#generate').onclick = () => this.sendMessageToGenerate()
         this.solutionMatrix = this.createSlots(false)
         this.errorsTag = document.querySelector('#errors')
         this.numErrors = 0
+        this.worker = new Worker('js/worker.js')
+        this.worker.onmessage = (e) => this.handleMessage(e)
         // document.querySelector('#generate').onclick = () => this.fillBoard(this.generatePuzzle())
         // this.animationActivated = false
         // document.querySelector('#animation-radio').onclick = (e) => this.animationActivated = e.target.checked
     }
     
-    solve(){
-        this.solveNumMatrix()
-        this.playingFlag = 0
-        if(!this.matrixLockedFlag){
+    startLoading(){
+        document.querySelector('#loading').classList.add('displayed')
+    }
+
+    stopLoading(){
+        document.querySelector('#loading').classList.remove('displayed')
+    }
+
+
+    handleMessage(e){
+        this.stopLoading()
+        if(e.data[0] == 'solve'){
+            this.numericalMatrix = e.data[1]
+            this.animationMovesArray = e.data[2]
             this.printOutSolution()
-            // alert('UNSOLVABLE SUDOKU!')
+        } else if(e.data[0] == 'generate'){
+            this.solutionMatrix = e.data[2]
+            this.play(e.data[1])
         }
+    }
+
+
+    sendMessageToSolve(){
+        this.playingFlag = 1
+        this.worker.postMessage(['solve', this.numericalMatrix, this.animationMovesArray])
+        console.log('main',this.numericalMatrix)
+        this.startLoading()
+        // this.solveNumMatrix()
+        // this.playingFlag = 0
+        // if(!this.matrixLockedFlag){
+            // this.printOutSolution()
+            // alert('UNSOLVABLE SUDOKU!')
+    }
+
+    sendMessageToGenerate(){
+        this.startLoading()
+        this.clearMatrix()
+        this.playingFlag = 1
+        this.worker.postMessage(['generate', this.numericalMatrix, this.solutionMatrix])
+    }
+
+
+
+    play(returnMatrix){
+        this.fillBoard(returnMatrix)
+        // this.fillBoard(this.generatePuzzle())   
+        this.numErrors = 0
+        this.errorsTag.classList.add('displayed')
+        this.errorsTag.innerHTML = 'Errors = 0/3'
     }
 
     fillBoard(matrix){
@@ -143,119 +187,112 @@ class SudokuGame {
         }
     }
 
-    fillSudoku(matrix, settingsObject = { checkNumSolutions: false, numSolutions: 0, maxSolutions: 1 }){
+    // fillSudoku(matrix, settingsObject = { checkNumSolutions: false, numSolutions: 0, maxSolutions: 1 }){
         
         
-        const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    //     const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         
-        randomizeArray(numbers)
+    //     randomizeArray(numbers)
         
-        let finishedFlag = 0
+    //     let finishedFlag = 0
         
-        for(let i = 0; i < 9; i++){
-            for(let j = 0; j < 9; j++){
+    //     for(let i = 0; i < 9; i++){
+    //         for(let j = 0; j < 9; j++){
                         
-                if(matrix[i][j] == 0){
+    //             if(matrix[i][j] == 0){
                     
-                    for(let k = 1; k <= 9 && !finishedFlag; k++){
+    //                 for(let k = 1; k <= 9 && !finishedFlag; k++){
                         
-                        if(this.numValueIsPossible(matrix, numbers[k - 1], j, i)){
-                            matrix[i][j] = numbers[k - 1]
-                            finishedFlag = this.fillSudoku(matrix, settingsObject)
-                            if(!finishedFlag){
-                                matrix[i][j] = 0
-                            }
-                        }
-                    }
-                    return finishedFlag
-                }
-            }
-        }
+    //                     if(this.numValueIsPossible(matrix, numbers[k - 1], j, i)){
+    //                         matrix[i][j] = numbers[k - 1]
+    //                         finishedFlag = this.fillSudoku(matrix, settingsObject)
+    //                         if(!finishedFlag){
+    //                             matrix[i][j] = 0
+    //                         }
+    //                     }
+    //                 }
+    //                 return finishedFlag
+    //             }
+    //         }
+    //     }
         
-        if(settingsObject.checkNumSolutions == true && settingsObject.numSolutions < settingsObject.maxSolutions){
-            settingsObject.numSolutions++;
-            return 0;
-        }
-        return 1
-    }
+    //     if(settingsObject.checkNumSolutions == true && settingsObject.numSolutions < settingsObject.maxSolutions){
+    //         settingsObject.numSolutions++;
+    //         return 0;
+    //     }
+    //     return 1
+    // }
 
-    play(){
-        this.playingFlag = 1
-        this.fillBoard(this.generatePuzzle(this.solutionMatrix))
-        // this.fillBoard(this.generatePuzzle())   
-        this.numErrors = 0
-        this.errorsTag.classList.add('displayed')
-        this.errorsTag.innerHTML = 'Errors = 0/3'
-    }
+    
 
 
-    generatePuzzle(solutionMatrix = undefined){
+    // generatePuzzle(solutionMatrix = undefined){
 
-        this.clearMatrix()
+    //     this.clearMatrix()
 
-        const matrix = this.createSlots(false)
+    //     const matrix = this.createSlots(false)
 
-        this.fillSudoku(matrix,{ checkNumSolutions: false })
+    //     this.fillSudoku(matrix,{ checkNumSolutions: false })
 
-        if(solutionMatrix){
-            for(let i = 0; i < 9; i++){
-                for(let j = 0; j < 9; j++){
-                    solutionMatrix[i][j] = matrix[i][j]
-                }
-            }
-        }
+    //     if(solutionMatrix){
+    //         for(let i = 0; i < 9; i++){
+    //             for(let j = 0; j < 9; j++){
+    //                 solutionMatrix[i][j] = matrix[i][j]
+    //             }
+    //         }
+    //     }
 
 
-        const notTriedArray = []
+    //     const notTriedArray = []
         
-        for(let i = 0; i < 81; i++){
-            notTriedArray.push(i)
-        }
+    //     for(let i = 0; i < 81; i++){
+    //         notTriedArray.push(i)
+    //     }
         
-        let randIndex = randomNumber(notTriedArray.length)
-        let randSlot = notTriedArray[randIndex]
-        let randX = randSlot % 9
-        let randY = Math.floor(randSlot / 9)
+    //     let randIndex = randomNumber(notTriedArray.length)
+    //     let randSlot = notTriedArray[randIndex]
+    //     let randX = randSlot % 9
+    //     let randY = Math.floor(randSlot / 9)
         
-        let curValue = 0
+    //     let curValue = 0
         
-        const solutionsObject = { checkNumSolutions: true, numSolutions: 0, maxSolutions: 2 }
+    //     const solutionsObject = { checkNumSolutions: true, numSolutions: 0, maxSolutions: 2 }
 
-        let difficultyThreshold = 30
+    //     let difficultyThreshold = 30
         
-        while(notTriedArray.length > difficultyThreshold){
+    //     while(notTriedArray.length > difficultyThreshold){
 
-            solutionsObject.numSolutions = 0
+    //         solutionsObject.numSolutions = 0
 
-            curValue = matrix[randY][randX]
+    //         curValue = matrix[randY][randX]
 
-            matrix[randY][randX] = 0
+    //         matrix[randY][randX] = 0
 
-            let start = new Date()
+    //         let start = new Date()
 
-            this.fillSudoku(matrixCopy(matrix), solutionsObject)
+    //         this.fillSudoku(matrixCopy(matrix), solutionsObject)
             
-            let end = new Date()
+    //         let end = new Date()
 
-            console.log(notTriedArray.length, end - start, (end - start)*1 > 500)
+    //         // console.log(notTriedArray.length, end - start, (end - start)*1 > 500)
 
-            if((end - start) > 500)
-                difficultyThreshold = 35
+    //         if((end - start) > 500)
+    //             difficultyThreshold = 35
 
-            if(solutionsObject.numSolutions > 1){
-                matrix[randY][randX] = curValue
-                // attemptsMatrix[randY][randX] = 1
-            }
+    //         if(solutionsObject.numSolutions > 1){
+    //             matrix[randY][randX] = curValue
+    //             // attemptsMatrix[randY][randX] = 1
+    //         }
 
-            removeElementAtIndex(notTriedArray, randIndex)
+    //         removeElementAtIndex(notTriedArray, randIndex)
             
-            randIndex = randomNumber(notTriedArray.length)
-            randSlot = notTriedArray[randIndex]
-            randX = randSlot % 9
-            randY = Math.floor(randSlot / 9)
-        }
-        return matrix
-    }
+    //         randIndex = randomNumber(notTriedArray.length)
+    //         randSlot = notTriedArray[randIndex]
+    //         randX = randSlot % 9
+    //         randY = Math.floor(randSlot / 9)
+    //     }
+    //     return matrix
+    // }
 
     clearMatrix(){
         
@@ -390,41 +427,41 @@ class SudokuGame {
         return true
     }
 
-    solveNumMatrix(print = 1){
+    // solveNumMatrix(print = 1){
         
-        let result = 0
+    //     let result = 0
         
 
-        for(let i = 0; i < 9; i++){
-            for(let j = 0; j < 9; j++){
+    //     for(let i = 0; i < 9; i++){
+    //         for(let j = 0; j < 9; j++){
 
-                if(this.numericalMatrix[i][j] == 0){
+    //             if(this.numericalMatrix[i][j] == 0){
                     
-                    for(let k = 1; k <= 9 && !this.matrixLockedFlag; k++){
+    //                 for(let k = 1; k <= 9 && !this.matrixLockedFlag; k++){
                         
-                        if(this.numValueIsPossible(this.numericalMatrix, k, j, i)){
+    //                     if(this.numValueIsPossible(this.numericalMatrix, k, j, i)){
                             
-                            this.numericalMatrix[i][j] = k
-                            this.animationMovesArray.push(`${i}${j}${k}`)
+    //                         this.numericalMatrix[i][j] = k
+    //                         this.animationMovesArray.push(`${i}${j}${k}`)
 
-                            result = this.solveNumMatrix()
-                            if(!this.matrixLockedFlag){
-                                this.numericalMatrix[i][j] = 0
-                                this.animationMovesArray.push(`${i}${j}0`)
-                            }
-                        }
+    //                         result = this.solveNumMatrix()
+    //                         if(!this.matrixLockedFlag){
+    //                             this.numericalMatrix[i][j] = 0
+    //                             this.animationMovesArray.push(`${i}${j}0`)
+    //                         }
+    //                     }
                     
-                    }
-                    return result
-                }
-            }
-        }
+    //                 }
+    //                 return result
+    //             }
+    //         }
+    //     }
         
-        if(print)
-            this.printOutSolution()
-        this.matrixLockedFlag = 1
-        return 1
-    }
+    //     if(print)
+    //         this.printOutSolution()
+    //     this.matrixLockedFlag = 1
+    //     return 1
+    // }
 
     printOutSolution(){
         
@@ -493,7 +530,10 @@ class SudokuGame {
 
         let key = event.keyCode;
 
-        console.log(key)
+        // console.log(key)
+        if(key == 8){
+            this.selectedSlot.removePencilGrid()
+        }
 
         if(key == 81){
             pencil.checked = pencil.checked ? false : true
@@ -519,7 +559,7 @@ class SudokuGame {
                 this.selectedSlot.writeInSlot(key)
                 this.selectNext()
             } else if(this.playingFlag){
-                console.log(this.solutionMatrix)
+                // console.log(this.solutionMatrix)
                 this.wrongValue()
             }
         }

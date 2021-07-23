@@ -8,7 +8,9 @@ body{
     color: rgb(2, 14, 71);;
 }
 
+
 #sudoku-container{
+    position: relative;
     height: 100%;
     width: 400px;
     display: flex;
@@ -250,5 +252,49 @@ label input:checked + .checkmark .inner{
     .slot-grid-mode{
         grid-template-columns: repeat(3, 10.11px);
         grid-template-rows: repeat(3, 10.11px);
+    }
+}
+
+#loading{
+    position: absolute;
+    width: 102%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0);
+    /* opacity: 10; */
+    z-index: -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#loading.displayed{
+    z-index: 1;
+    /* opacity: 50; */
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+#loading.displayed #spinner{
+    opacity: 100;
+}
+
+#spinner{
+    opacity: 0;
+    background-color: transparent;
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    border: 10px solid rgb(2, 14, 71);
+    border-top: 10px solid transparent;
+    animation-name: spin;
+    animation-iteration-count: infinite;
+    animation-duration: 1s;
+}
+
+@keyframes spin {
+    0%{
+        transform: rotate(0deg);
+    }
+    100%{
+        transform: rotate(360deg);
     }
 }
