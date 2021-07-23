@@ -143,13 +143,12 @@ class SudokuGame {
         }
     }
 
-    fillSudoku(matrix, settingsObject = { checkNumSolutions: false, numSolutions: 0, maxSolutions: 1 }, rand = 0){
+    fillSudoku(matrix, settingsObject = { checkNumSolutions: false, numSolutions: 0, maxSolutions: 1 }){
         
         
         const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         
-        if(rand)
-            randomizeArray(numbers)
+        randomizeArray(numbers)
         
         let finishedFlag = 0
         
@@ -196,7 +195,7 @@ class SudokuGame {
 
         const matrix = this.createSlots(false)
 
-        this.fillSudoku(matrix,{ checkNumSolutions: false }, 1)
+        this.fillSudoku(matrix,{ checkNumSolutions: false })
 
         if(solutionMatrix){
             for(let i = 0; i < 9; i++){
@@ -222,7 +221,7 @@ class SudokuGame {
         
         const solutionsObject = { checkNumSolutions: true, numSolutions: 0, maxSolutions: 2 }
 
-        let difficultyThreshold = 20
+        let difficultyThreshold = 30
         
         while(notTriedArray.length > difficultyThreshold){
 
@@ -238,8 +237,10 @@ class SudokuGame {
             
             let end = new Date()
 
-            if(start - end > 500)
-                break
+            console.log(notTriedArray.length, end - start, (end - start)*1 > 500)
+
+            if((end - start) > 500)
+                difficultyThreshold = 35
 
             if(solutionsObject.numSolutions > 1){
                 matrix[randY][randX] = curValue
@@ -436,11 +437,11 @@ class SudokuGame {
 
         let currentAction = this.animationMovesArray.shift()
         
-        
-        this.isAnimating = 1
-
         if(currentAction == undefined)
             return
+        
+        this.isAnimating = 1
+        
 
         const currentSlot = this.tagMatrix[currentAction[0]][currentAction[1]]
 

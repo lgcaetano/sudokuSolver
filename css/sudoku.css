@@ -74,7 +74,7 @@ body{
     display: flex;
     flex-direction: column;
     height: calc(50% - 150px);
-    width: 400px;
+    width: 100%;
     justify-content: space-around;
     /* align-items: center; */
 }
@@ -217,7 +217,7 @@ label input:checked + .checkmark .inner{
 }
 
 #info{
-    top: 10%;
+    top: 5%;
     position: relative;
     width: 75%;
     left: 12.5%;
@@ -225,4 +225,30 @@ label input:checked + .checkmark .inner{
     font-size: 15px;
     opacity: 0;
     transition: 2s;
+}
+
+@media(max-width: 800px), (max-height: 500px){
+    #sudoku-board{
+        height: 300px;
+        width: 300px;
+    }
+    .slot{
+        line-height: initial;
+    }
+    #sudoku-container{
+        width: 300px;
+    }
+    #radio-container label{
+        font-size: 13px;
+    }
+    #info-button{
+        display: none;
+    }
+    #info{
+        display: none;
+    }
+    .slot-grid-mode{
+        grid-template-columns: repeat(3, 10.11px);
+        grid-template-rows: repeat(3, 10.11px);
+    }
 }
