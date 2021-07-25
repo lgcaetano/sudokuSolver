@@ -594,8 +594,9 @@ class SudokuGame {
     }
 
     gameOver(){
+        this.playingFlag = 0
         document.querySelector('#errors').innerHTML = `YOU LOST!`
-        this.solve()
+        this.sendMessageToSolve()
     }
 
     arrowPressed(arrowKey){
