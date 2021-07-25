@@ -485,7 +485,8 @@ class SudokuGame {
         
         let animationActivated = document.querySelector('#animation-radio').checked
         
-        if(!animationActivated){
+        if(!animationActivated &&!this.isAnimating){
+            this.isAnimating = 0
             this.justShowSolution()
             return
         }
@@ -505,7 +506,7 @@ class SudokuGame {
         currentSlot.writeInSlot(value)
 
         if(this.animationMovesArray.length > 0){
-            setTimeout(() => this.printOutSolution(), 0)
+            setTimeout(() => this.printOutSolution(), 20)
         } else{
             this.isAnimating = 0
         }
@@ -513,9 +514,11 @@ class SudokuGame {
 
 
     justShowSolution(){
+        console.log(this.numericalMatrix)
         this.tagMatrix.forEach(array => array.forEach(elemento => {
             elemento.updateValue(true)
         }))
+        console.log(this.numericalMatrix)
     }
 
 
@@ -766,6 +769,8 @@ class SudokuSlot{
 
     updateValue(solution = false){
 
+        this.tag.classList.remove('unfilled')
+        
         if(this.getValue() == this.valuesMatrix[this.getY()][this.getX()])
             return
 

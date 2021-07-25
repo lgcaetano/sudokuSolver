@@ -225,7 +225,7 @@ function generatePuzzle(solutionMatrix = undefined){
     
     const solutionsObject = { checkNumSolutions: true, numSolutions: 0, maxSolutions: 2 }
 
-    let difficultyThreshold = 20
+    let difficultyThreshold = 0
     
     while(notTriedArray.length > difficultyThreshold){
 
