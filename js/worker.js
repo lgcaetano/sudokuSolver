@@ -1,3 +1,27 @@
+function orderByNumberOfPossibilities(matrix){
+    const orderedSlots =[]
+    for(let i = 0; i < 9; i++){
+        for(let j = 0; j < 9; j++){
+            orderedSlots.push([i, j, getNumPossibilities(matrix, i, j)])
+        }
+    }
+    orderedSlots.sort((slot1, slot2) => {
+       return slot1[2] - slot2[2]
+    })
+    // console.log(orderedSlots)
+    return orderedSlots
+}
+
+function getNumPossibilities(matrix, y, x){
+    let result = 0
+    for(let i = 1; i <= 9; i++){
+        if(numValueIsPossible(matrix, i, x, y))
+            result++
+    }
+    return result
+}
+
+
 function getMatrixColumn(matrix, columnNumber){
     const arrColuna = []
     matrix.forEach(array => array.forEach((elemento, index) => {
@@ -120,7 +144,7 @@ function  numValueIsPossible(matrix, value, x, y){
 
 
 
-function fillSudoku(matrix, settingsObject = { checkNumSolutions: false, numSolutions: 0, maxSolutions: 1 }){
+function fillSudoku(matrix, settingsObject = { checkNumSolutions: false, numSolutions: 0, maxSolutions: 1 }, orderedSlots){
         
         
     const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -128,19 +152,29 @@ function fillSudoku(matrix, settingsObject = { checkNumSolutions: false, numSolu
     randomizeArray(numbers)
     
     let finishedFlag = 0
-    
+
+    // const orderedSlots = orderByNumberOfPossibilities(matrix)
+
+    let curY = 0
+    let curX = 0
+
     for(let i = 0; i < 9; i++){
         for(let j = 0; j < 9; j++){
-                    
-            if(matrix[i][j] == 0){
+            
+            curY = orderedSlots[9*i + j][0]
+            curX = orderedSlots[9*i + j][1]
+
+            if(matrix[curY][curX] == 0){
                 
                 for(let k = 1; k <= 9 && !finishedFlag; k++){
                     
-                    if(numValueIsPossible(matrix, numbers[k - 1], j, i)){
-                        matrix[i][j] = numbers[k - 1]
-                        finishedFlag = fillSudoku(matrix, settingsObject)
+                    if(numValueIsPossible(matrix, numbers[k - 1], curX, curY)){
+                        matrix[curY][curX] = numbers[k - 1]
+                        finishedFlag = fillSudoku(matrix, settingsObject, orderedSlots)
                         if(!finishedFlag){
-                            matrix[i][j] = 0
+                            matrix[curY][curX] = 0
+                        } else{
+                            return finishedFlag
                         }
                     }
                 }
@@ -165,7 +199,7 @@ function generatePuzzle(solutionMatrix = undefined){
 
     const matrix = createSlots(false)
 
-    fillSudoku(matrix,{ checkNumSolutions: false })
+    fillSudoku(matrix, { checkNumSolutions: false }, orderByNumberOfPossibilities(matrix))
 
     if(solutionMatrix){
         for(let i = 0; i < 9; i++){
@@ -191,7 +225,7 @@ function generatePuzzle(solutionMatrix = undefined){
     
     const solutionsObject = { checkNumSolutions: true, numSolutions: 0, maxSolutions: 2 }
 
-    let difficultyThreshold = 0
+    let difficultyThreshold = 20
     
     while(notTriedArray.length > difficultyThreshold){
 
@@ -203,7 +237,7 @@ function generatePuzzle(solutionMatrix = undefined){
 
         let start = new Date()
 
-        fillSudoku(matrixCopy(matrix), solutionsObject)
+        fillSudoku(matrixCopy(matrix), solutionsObject, orderByNumberOfPossibilities(matrix))
         
         let end = new Date()
 
@@ -230,27 +264,36 @@ function generatePuzzle(solutionMatrix = undefined){
 
 
 
-function solveNumMatrix(matrix, animationMovesArray){
+function solveNumMatrix(matrix, animationMovesArray, orderedSlots2){
         
     let result = 0
     
+    const orderedSlots = orderByNumberOfPossibilities(matrix)
+
+    let curY = 0
+    let curX = 0
 
     for(let i = 0; i < 9; i++){
         for(let j = 0; j < 9; j++){
 
-            if(matrix[i][j] == 0){
+            curY = orderedSlots[9*i + j][0]
+            curX = orderedSlots[9*i + j][1]
+
+            if(matrix[curY][curX] == 0){
                 
                 for(let k = 1; k <= 9 && !result; k++){
                     
-                    if(numValueIsPossible(matrix, k, j, i)){
+                    if(numValueIsPossible(matrix, k, curX, curY)){
                         
-                        matrix[i][j] = k
-                        animationMovesArray.push(`${i}${j}${k}`)
-
-                        result = solveNumMatrix(matrix, animationMovesArray)
+                        matrix[curY][curX] = k
+                        animationMovesArray.push(`${curY}${curX}${k}`)
+                        // console.log(matrix)
+                        result = solveNumMatrix(matrix, animationMovesArray, orderedSlots)
                         if(!result){
-                            matrix[i][j] = 0
-                            animationMovesArray.push(`${i}${j}0`)
+                            matrix[curY][curX] = 0
+                            animationMovesArray.push(`${curY}${curX}0`)
+                        } else{
+                            return result
                         }
                     }
                 
@@ -271,6 +314,7 @@ function getDimensions(array){
 }
 
 onmessage = (e) => {
+
     
     // console.log('worker', e.data[1])
     
@@ -281,7 +325,8 @@ onmessage = (e) => {
 
 
     if(actionType == 'solve'){
-        solveNumMatrix(matrix, e.data[2])
+        
+        solveNumMatrix(matrix, e.data[2], orderByNumberOfPossibilities(matrix))
         // console.log(e.data[2])
         postMessage(['solve', matrix, e.data[2]])
     }

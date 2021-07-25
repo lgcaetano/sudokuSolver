@@ -162,7 +162,7 @@ class SudokuGame {
 
     sendMessageToSolve(){
 
-        console.log('main',this.numericalMatrix)
+        // console.log('main',this.numericalMatrix)
 
         if(this.isAnimating)
             return
@@ -183,7 +183,7 @@ class SudokuGame {
             return
 
         this.clearMatrix()
-        console.log(this.numericalMatrix)
+        // console.log(this.numericalMatrix)
         this.startLoading()
         // this.isAnimating = 1
         this.worker.postMessage(['generate', this.numericalMatrix, this.solutionMatrix])
@@ -193,7 +193,7 @@ class SudokuGame {
 
     play(returnMatrix){
         this.fillBoard(returnMatrix)
-        console.log(returnMatrix)
+        // console.log(returnMatrix)
         this.playingFlag = 1
         // this.fillBoard(this.generatePuzzle())   
         this.numErrors = 0
