@@ -127,6 +127,16 @@ class SudokuGame {
         // document.querySelector('#animation-radio').onclick = (e) => this.animationActivated = e.target.checked
     }
     
+    fillNumMatrix(matrix){
+        for(let i = 0; i < 9; i++){
+            for(let j = 0; j < 9; j++){
+                this.numericalMatrix[i][j] = matrix[i][j]
+            }
+        }
+    }
+
+
+
     startLoading(){
         document.querySelector('#loading').classList.add('displayed')
     }
@@ -139,21 +149,28 @@ class SudokuGame {
     handleMessage(e){
         this.stopLoading()
         if(e.data[0] == 'solve'){
-            this.numericalMatrix = e.data[1]
+            // this.numericalMatrix = e.data[1]
+            this.fillNumMatrix(e.data[1])
             this.animationMovesArray = e.data[2]
             this.printOutSolution()
         } else if(e.data[0] == 'generate'){
-            this.solutionMatrix = e.data[2]
             this.play(e.data[1])
+            this.solutionMatrix = e.data[2]
         }
     }
 
 
     sendMessageToSolve(){
-        this.playingFlag = 1
-        this.worker.postMessage(['solve', this.numericalMatrix, this.animationMovesArray])
+
         console.log('main',this.numericalMatrix)
+
+        if(this.isAnimating)
+            return
+
+
+        // this.isAnimating = 1
         this.startLoading()
+        this.worker.postMessage(['solve', this.numericalMatrix, this.animationMovesArray])
         // this.solveNumMatrix()
         // this.playingFlag = 0
         // if(!this.matrixLockedFlag){
@@ -162,9 +179,13 @@ class SudokuGame {
     }
 
     sendMessageToGenerate(){
-        this.startLoading()
+        if(this.isAnimating)
+            return
+
         this.clearMatrix()
-        this.playingFlag = 1
+        console.log(this.numericalMatrix)
+        this.startLoading()
+        // this.isAnimating = 1
         this.worker.postMessage(['generate', this.numericalMatrix, this.solutionMatrix])
     }
 
@@ -172,6 +193,8 @@ class SudokuGame {
 
     play(returnMatrix){
         this.fillBoard(returnMatrix)
+        console.log(returnMatrix)
+        this.playingFlag = 1
         // this.fillBoard(this.generatePuzzle())   
         this.numErrors = 0
         this.errorsTag.classList.add('displayed')
@@ -182,6 +205,7 @@ class SudokuGame {
         for(let i = 0; i < 9; i++){
             for(let j = 0; j < 9; j++){
                 // console.log(this.tagMatrix)
+                
                 this.tagMatrix[i][j].writeInSlot(matrix[i][j])
             }
         }
@@ -319,12 +343,6 @@ class SudokuGame {
         }
     }
 
-    trySolveMatrix(){
-        this.solveNumMatrix()
-        if(!this.matrixLockedFlag){
-            this.sudokuImpossible()
-        }
-    }
 
     checkOutsideClick(e){
         if(!(this.tag == e.target || this.tag.contains(e.target)))

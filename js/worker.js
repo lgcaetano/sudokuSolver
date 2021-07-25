@@ -272,7 +272,7 @@ function getDimensions(array){
 
 onmessage = (e) => {
     
-    console.log('worker', e.data[1])
+    // console.log('worker', e.data[1])
     
     let actionType = e.data[0]
     const matrix = e.data[1]
@@ -282,7 +282,7 @@ onmessage = (e) => {
 
     if(actionType == 'solve'){
         solveNumMatrix(matrix, e.data[2])
-        console.log(e.data[2])
+        // console.log(e.data[2])
         postMessage(['solve', matrix, e.data[2]])
     }
     else if(actionType == 'generate'){
