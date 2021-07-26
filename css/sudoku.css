@@ -102,7 +102,7 @@ body{
 }
 
 .unfilled{
-    background-color: red;
+    background-color: darkslategray;
 }
 
 #lower-buttons{
@@ -168,7 +168,7 @@ label input:checked + .checkmark .inner{
     /* height: calc(100%/3);
     width: calc(100%/3); */
     color: grey;
-    font-size: 10px;
+    font-size: 12px;
     text-align: center;
     line-height: 15px;
     /* position: absolute; */

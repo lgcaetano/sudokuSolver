@@ -514,11 +514,9 @@ class SudokuGame {
 
 
     justShowSolution(){
-        console.log(this.numericalMatrix)
         this.tagMatrix.forEach(array => array.forEach(elemento => {
             elemento.updateValue(true)
         }))
-        console.log(this.numericalMatrix)
     }
 
 
